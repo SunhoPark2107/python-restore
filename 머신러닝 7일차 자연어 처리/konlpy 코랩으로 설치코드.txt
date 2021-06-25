@@ -1,0 +1,6 @@
+!apt-get install g++ openjdk-8-jdk
+!pip install konlpy JPype1-py3
+!bash <(curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh)
+
+from konlpy.tag import Mecab
+tokenizer = Mecab()

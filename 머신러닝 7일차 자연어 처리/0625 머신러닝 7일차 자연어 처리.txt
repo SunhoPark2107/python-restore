@@ -1,0 +1,66 @@
+
+*** 0625 머신러닝 7일차 자연어 처리 ***
+
+정리시 참고한 사이트: 
+1) BOW 생성 관련 함수
+https://datascienceschool.net/03%20machine%20learning/03.01.03%20Scikit-Learn%EC%9D%98%20%EB%AC%B8%EC%84%9C%20%EC%A0%84%EC%B2%98%EB%A6%AC%20%EA%B8%B0%EB%8A%A5.html
+
+2) transform 메서드 사용방법
+https://kongdols-room.tistory.com/169
+https://jjangjjong.tistory.com/9
+
+3) cross_val_score 사용방법(교차검증)
+https://homeproject.tistory.com/entry/%EA%B5%90%EC%B0%A8%EA%B2%80%EC%A6%9D-cross-validation
+
+
+
+sklearn.datasets import load_files
+
+sklearn.feature_extraction.text import CountVectorizer
+
+sklearn의 서브패키지인
+"feature_extraction.text"
+는 다음과 같은 함수를 포함한다.
+
+DictVectorizer: 각 단어의 수를 세어놓은 사전에서 BOW 인코딩 벡터를 만든다.
+
+CountVectorizer: 문서 집합에서 단어 "토큰을 생성"하고 각 단어의 수를 세어 "BOW" 인코딩 벡터를 만든다.
+
+countvectorizer 는 다음과 같은 인수 가질 수 있음.
+
+=> stop_words : 불용어 모음 생성
+=> tokenizer : 토큰 정의용 정규 표현식. 한국어의 경우, Mecab이라는 형태소 분석기 tokenizer가 없으면 단어 분류가 되지 않아 분석이 제대로 이루어지지 않는다. 영어의 경우 tokenizer가 없어도 어느 정도 분석이 잘 되는 편.
+
+TfidfVectorizer: CountVectorizer와 비슷하지만 TF-IDF 방식으로 단어의 가중치를 조정한 BOW 인코딩 벡터를 만든다.
+
+HashingVectorizer: 해시 함수(hash function)을 사용하여 적은 메모리와 빠른 속도로 BOW 인코딩 벡터를 만든다.
+
+vect.vacabulary_ : 단어 BOW 출력.(토큰: 할당된 수)
+
+vect = CountVectorizer().fit(text_train)
+X_train = vect.transform(text_train)
+X_train.toarray()
+
+transform => 연산값을 채우는 함수.
+즉, CountVectorizer().fit(text_train)이라는 함수의 연산 결과를 저장해 두고, 마지막에 toarray로 배열 형태로 바꾸어 줌으로써 사용 가능하게 만드는 것.
+
+
+from sklearn.model_selection import cross_val_score
+
+from sklearn.linear_model import LogisticRegression
+
+scores = cross_val_score(LogisticRegression(max_iter=1000), X_train, y_train, cv=5)
+scores
+
+cross_val_score은 trian_test_split() 함수를 이용하여 훈련/테스트 셋으로 한번 나누어 검증해 보는 것보다 성능이 좋음.(교차검증, Cross Validation)
+
+k-겹 교차검증에서는 데이터를 비슷한 크기의 집합 'k'개로 나누고, k번만큼의 대조를 함.
+
+cross_val_score(기본 k-fold 교차검증)에 들어가는 매개변수는 
+
+(모델명, 훈련데이터, 타깃, cv = 폴드 수) 이다.
+
+# 이 데이터는 일반 str이 아니라 byte string 이므로, 앞에 b를 붙여 주어 이것이 byte str 임을 알려 주어야 인자로 받아들인다.
+# b 없이 그냥 쓰면, "a bytes-like object is required, not 'str'" 라는 에러 메시지를 출력하게 된다.
+X_test = vect.transform(text_test)
+text_test = [a_review.replace(b"<br />", b" ") for a_review in text_test]
